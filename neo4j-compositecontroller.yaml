@@ -1,0 +1,27 @@
+apiVersion: metacontroller.k8s.io/v1alpha1
+kind: CompositeController
+metadata:
+  name: neo4j-composite-controller
+spec:
+  # CRD Definition
+  parentResource:
+    apiVersion: database.neo4j.org/v1alpha1
+    resource: neo4jclusters
+  # Webhook for sync
+  hooks:
+    sync:
+      webhook:
+        url: http://neo4j-controller.neo4j.svc.cluster.local:8081/sync
+  # Automatically generate labelSelector to associate children with parent resource
+  generateSelector: true
+  # Define child resources that the controller manages
+  childResources:
+    # Core Deployment for Neo4j
+    - apiVersion: apps/v1
+      resource: deployments
+    # Read Replica Deployment for Neo4j
+    - apiVersion: apps/v1
+      resource: deployments
+    # Service for Neo4j
+    - apiVersion: v1
+      resource: services

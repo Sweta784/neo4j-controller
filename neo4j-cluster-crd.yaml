@@ -1,0 +1,30 @@
+apiVersion: database.neo4j.org/v1alpha1
+kind: Neo4jCluster
+metadata:
+  name: neo4j-test-cluster
+  namespace: neo4j
+spec:
+  adminPassword: neo4jpassword
+  coreReplicas: 1
+  image: neo4j:4.4.9
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: longhorn
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  service:
+    type: NodePort
+    ports:
+      - name: http
+        nodePort: 30074
+        port: 7474
+        targetPort: 7474
+  hpa:
+    minReplicas: 1
+    maxReplicas: 3

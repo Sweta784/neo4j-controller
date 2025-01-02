@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neo4j-controller
+  namespace: neo4j
+  labels:
+    app: neo4j-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neo4j-controller
+  template:
+    metadata:
+      labels:
+        app: neo4j-controller
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2024-12-24T07:17:54Z"
+    spec:
+      containers:
+        - name: controller
+          image: sweta037/metacontroller:v1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+            - containerPort: 7474
+            - containerPort: 8081  # Port for the readiness check
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+          readinessProbe:
+            httpGet:
+              path: /readiness  # Ensure the correct path here for your application
+              port: 8081
+            initialDelaySeconds: 15    # Increased delay to wait for app initialization
+            periodSeconds: 10          # Frequency of checks
+            failureThreshold: 3        # Number of failed checks before marking the pod as not ready
+            timeoutSeconds: 5          # Timeout for each individual check
