@@ -1,0 +1,13 @@
+FROM python:3.8-slim
+
+# Install required Python packages
+RUN pip install kubernetes flask
+
+# Copy the webhook script into the container
+COPY main.py /main.py
+
+# Expose the necessary port
+EXPOSE 8081
+
+# Run the Python server
+CMD ["python", "/main.py"]
