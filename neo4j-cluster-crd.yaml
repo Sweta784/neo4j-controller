@@ -1,30 +1,84 @@
-apiVersion: database.neo4j.org/v1alpha1
-kind: Neo4jCluster
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
 metadata:
-  name: neo4j-test-cluster
-  namespace: neo4j
+  name: neo4jclusters.database.neo4j.org
 spec:
-  adminPassword: neo4jpassword
-  coreReplicas: 1
-  image: neo4j:4.4.9
-  persistence:
-    enabled: true
-    size: 1Gi
-    storageClass: longhorn
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1Gi
-    requests:
-      cpu: 250m
-      memory: 512Mi
-  service:
-    type: NodePort
-    ports:
-      - name: http
-        nodePort: 30074
-        port: 7474
-        targetPort: 7474
-  hpa:
-    minReplicas: 1
-    maxReplicas: 3
+  group: database.neo4j.org
+  names:
+    kind: Neo4jCluster
+    listKind: Neo4jClusterList
+    plural: neo4jclusters
+    singular: neo4jcluster
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              adminPassword:
+                type: string
+              coreReplicas:
+                type: integer
+              hpa:
+                type: object
+                properties:
+                  minReplicas:
+                    type: integer
+                  maxReplicas:
+                    type: integer
+              image:
+                type: string
+              persistence:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  size:
+                    type: string
+                  storageClass:
+                    type: string
+              readReplicaReplicas:
+                type: integer
+              resources:
+                type: object
+                properties:
+                  requests:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                  limits:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+              service:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  ports:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        protocol:
+                          type: string
+                        port:
+                          type: integer
+                        targetPort:
+                          type: integer
